@@ -4,7 +4,7 @@ from .texutils import TexDocument
 def make_histogram(hist_dict, colors, title=None, wbar=0.4, add_percent=True, scale=1):
     assert len(hist_dict) <= len(colors)
     s = ""
-    s_scale =  "" if scale != 1 else f"[{scale:.2f}]"
+    s_scale =  "" if scale != 1 else f"[scale={scale:.2f}]"
     s = s_append(s, r"\begin{tikzpicture}"+s_scale, tab="")
     s = s_append(s, r"\begin{axis}[")
     s = s_append(s, r"tick align=outside,")
@@ -27,7 +27,7 @@ def make_histogram(hist_dict, colors, title=None, wbar=0.4, add_percent=True, sc
         htemp += f"(axis cs:{i-wbar},0) rectangle "
         if add_percent:
             percent = count * 100 / sum(hist_dict.values())
-            htemp += r"node[label=below:$("+f"{percent:.2f}"+r"\%)$] {$"+f"{count}"+r"$}"
+            htemp += r"node[label=below:{\small $("+f"{percent:.2f}"+r"\%)$}] {$"+f"{count}"+r"$}"
         else:
             htemp += r"node {$"+f"{count}"+r"$}"
         htemp += f"(axis cs:{i+wbar},{count});"
@@ -75,6 +75,8 @@ class TikzDocument(TexDocument):
 
     def add_histogram(self, hist_dict, title=None, wbar=0.4, floating=None):
         self.add_figure(make_histogram(hist_dict, self.palette.keys(), title, wbar), floating)
+
+
 
 
 if __name__ == '__main__':

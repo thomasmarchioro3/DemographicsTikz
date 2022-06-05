@@ -2,6 +2,7 @@ import os
 import pickle
 import datetime
 import numpy as np
+from utils.tikzutils import TikzDocument
 
 SAMPLE_DATA = [
     {
@@ -42,14 +43,14 @@ SAMPLE_DATA = [
 def make_binning(attr, attrbin):
     attr_binned = np.digitize(attr, attrbin, right=False) # range: attrbin[i-1] <= x < attrbin[i]
     uniques, counts = np.unique(attr_binned, return_counts=True)
-    binnames = np.asarray([f'<{attrbin[0]}']+[f'{attrbin[i]}-{attrbin[i+1]-1}' for i in range(len(attrbin)-1)]+[f'>={attrbin[-1]}'])
+    binnames = np.asarray([r'$<'+f'{attrbin[0]}$']+[f'${attrbin[i]}-{attrbin[i+1]-1}$' for i in range(len(attrbin)-1)]+[r'$\geq'+f'{attrbin[-1]}$'])
     bins = binnames[uniques]
     return bins, counts
 
 if __name__ == "__main__":
 
-    #filename = os.path.join('data', 'demographics_data.pkl')
-    filename = 'na.pkl'
+    filename = os.path.join('data', 'demographics_data.pkl')
+    #filename = 'na.pkl'
     final_attributes = ['gender', 'age', 'height', 'bmi'] # final attributes to be released
 
     base_attributes = ['gender', 'date_of_birth', 'height', 'weight'] # attributes that are already contained in the dictionary
@@ -97,4 +98,10 @@ if __name__ == "__main__":
         else:
             bins, counts = np.unique(attr_data[attr], return_counts=True)
 
+        hist_dict = {bin: count for bin, count in zip(bins, counts)}
+
+        doc = TikzDocument(attr.capitalize(), None)
+
+        doc.add_histogram(hist_dict, title=attr.capitalize(), wbar=0.2 if attr=='gender' else 0.4, floating=None)
+        doc.save_document(f'out/{attr}.tex')
     exit(0)
